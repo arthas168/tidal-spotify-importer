@@ -11,14 +11,14 @@ mod tidal;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let test_import_playlist = "1MnoSgQYkCliMM7NxQ0kcj";
+    let test_import_playlist = "0T0Rdfh8bepjWcLAURRQ0U";
 
     // You can use any logger for debugging.
     pretty_env_logger::init();
 
     // The default credentials from the `.env` file will be used by default.
     let mut oauth = SpotifyOAuth::default()
-        .scope("user-follow-read user-follow-modify playlist-modify-private user-library-modify")
+        .scope("user-read-recently-played playlist-modify-public playlist-modify-private user-follow-read user-follow-modify playlist-modify-private user-library-modify user-library-read")
         .build();
 
     match get_token(&mut oauth).await {
