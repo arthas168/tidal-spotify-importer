@@ -1,5 +1,5 @@
 use anyhow::Error;
-use futures::{StreamExt, SinkExt};
+use futures::{SinkExt, StreamExt};
 use rspotify::client::Spotify;
 use rspotify::model::cud_result::CUDResult;
 use rspotify::model::search::SearchResult;
@@ -12,7 +12,7 @@ mod tidal;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let test_import_playlist = "66cX8bDIrHpiXY5J07Orzs";
+    let test_import_playlist = "0jWumFdwRDYSiT2ROnZ5RW";
 
     // You can use any logger for debugging.
     pretty_env_logger::init();
@@ -67,7 +67,7 @@ async fn main() -> Result<(), Error> {
             }
 
             let mut track_uris = vec![];
-            let mut failed = vec![];
+            let mut failed_uris = vec![];
 
             //TODO maybe use par it
             search_results.iter()
@@ -81,8 +81,8 @@ async fn main() -> Result<(), Error> {
                             }).collect::<Vec<&FullTrack>>();
                         match tracks.first() {
                             None => {
-                                println!("Could not find {} {}", artist, query); //TODO move me
-                                failed.push(format!("{}", query));
+                                let message = format!("Could not find {} {}", artist, query); //TODO move me
+                                failed_uris.push(message);
                             }
                             Some(value) => {
                                 let uri = value.uri.clone();
@@ -93,7 +93,11 @@ async fn main() -> Result<(), Error> {
                     }
                 });
 
-            let futures = track_uris.chunks(99).map(|track_ids| {
+            failed_uris.iter().for_each(|message| log::debug!("{}", message));
+
+
+            //TODO at this point we should probably retry
+            let futures = track_uris.chunks(80).map(|track_ids| {
                 spotify.user_playlist_add_tracks(
                     user.id.as_str(),
                     test_import_playlist,

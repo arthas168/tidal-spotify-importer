@@ -32,6 +32,7 @@
   <component name="ChangeListManager">
     <list default="true" id="bb27fc3c-bcbb-4ee6-b960-17193771c396" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.spotify_token_cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/.spotify_token_cache.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -70,7 +71,9 @@
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
+      <envs>
+        <env name="RUST_LOG" value="debug" />
+      </envs>
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
@@ -103,6 +106,10 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1313" y="318" width="804" height="710" key="#Plugins/0.0.3440.1440@0.0.3440.1440" timestamp="1605774902563" />
+    <state x="386" y="332" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606745675410">
+      <screen x="0" y="0" width="3440" height="1440" />
+    </state>
+    <state x="386" y="332" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.3440.1440@0.0.3440.1440" timestamp="1606745675410" />
     <state x="1365" y="479" width="700" height="388" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1605715564608">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
@@ -115,22 +122,22 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1137" y="406" key="FileChooserDialogImpl/0.0.3440.1440@0.0.3440.1440" timestamp="1605716030264" />
-    <state width="3396" height="367" key="GridCell.Tab.0.bottom" timestamp="1606740783076">
+    <state width="1784" height="367" key="GridCell.Tab.0.bottom" timestamp="1606745783213">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="3396" height="367" key="GridCell.Tab.0.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1606740783076" />
-    <state width="3396" height="367" key="GridCell.Tab.0.center" timestamp="1606740783074">
+    <state width="1784" height="367" key="GridCell.Tab.0.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1606745783213" />
+    <state width="1784" height="367" key="GridCell.Tab.0.center" timestamp="1606745783211">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="3396" height="367" key="GridCell.Tab.0.center/0.0.3440.1440@0.0.3440.1440" timestamp="1606740783074" />
-    <state width="3396" height="367" key="GridCell.Tab.0.left" timestamp="1606740783072">
+    <state width="1784" height="367" key="GridCell.Tab.0.center/0.0.3440.1440@0.0.3440.1440" timestamp="1606745783211" />
+    <state width="1784" height="367" key="GridCell.Tab.0.left" timestamp="1606745783209">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="3396" height="367" key="GridCell.Tab.0.left/0.0.3440.1440@0.0.3440.1440" timestamp="1606740783072" />
-    <state width="3396" height="367" key="GridCell.Tab.0.right" timestamp="1606740783075">
+    <state width="1784" height="367" key="GridCell.Tab.0.left/0.0.3440.1440@0.0.3440.1440" timestamp="1606745783209" />
+    <state width="1784" height="367" key="GridCell.Tab.0.right" timestamp="1606745783212">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="3396" height="367" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1606740783075" />
+    <state width="1784" height="367" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1606745783212" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1606732544028">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
