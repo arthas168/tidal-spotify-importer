@@ -23,7 +23,7 @@ async fn main() -> Result<(), Error> {
     match get_token(&mut oauth).await {
         Some(token_info) => {
             //TODO add structopt for file path
-            let tidal = tidal::get_tidal_from_file(String::from("./tidal-tracks-deathcore.json")).await?; //TODO add buffered reading
+            let tidal = tidal::get_tidal_from_file(String::from("./tidal-tracks-mixed.json")).await?; //TODO add buffered reading
             println!("Importing {} tracks", tidal.items.len());
 
             println!("Getting spotifty credentials");
@@ -44,6 +44,8 @@ async fn main() -> Result<(), Error> {
                 }).collect();
 
             for (artist, query) in queries {
+                let query = query.replace("(feat. ", "");
+                let query = query.replace(")", "");
                 if let Ok(find) = spotify.search(
                     query.as_str(),
                     SearchType::Track,
