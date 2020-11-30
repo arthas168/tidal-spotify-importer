@@ -3,6 +3,7 @@ use std::io::BufReader;
 use std::path::PathBuf;
 
 use anyhow::Error;
+use async_trait::async_trait;
 use rspotify::client::Spotify;
 use rspotify::model::cud_result::CUDResult;
 use rspotify::model::search::SearchResult;
@@ -13,7 +14,6 @@ use rspotify::senum::{Country, IncludeExternal, SearchType};
 use rspotify::util::get_token;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use async_trait::async_trait;
 
 use crate::cli::Opts;
 use crate::provider::StreamingProvider;
@@ -121,87 +121,30 @@ impl TidalProvider {
 }
 
 #[async_trait]
-impl StreamingProvider for TidalProvider {
-    async fn import(&self, spotify: Spotify, user: PrivateUser) -> Result<(), Error> {
+impl StreamingProvider<Tidal> for TidalProvider {
+    async fn gather_data(&self) -> Result<Tidal, Error> {
         println!("> Reading tidal file..");
         let tidal = get_tidal_from_file(&self.file).await?;
+        // read a source
         println!("> Importing {} tracks..", tidal.items.len() - 1);
-        println!("Collecting tracks");
-        let queries: Vec<(String, String)> = tidal.items.iter()
+        Ok(tidal)
+    }
+
+    fn convert_to_query(&self, item: Tidal) -> Vec<(String, String)> {
+        println!("> Converting to query");
+        // convert items to title with artists
+        item.items.iter()
             .map(|track| {
                 let artist: String = track.item.artists.iter().map(|artist| artist.name.to_lowercase()).collect::<Vec<String>>().join(" ");
                 let query: String = vec![artist, track.item.title.to_lowercase()].join(" ");
                 (track.item.artist.name.to_lowercase(), query)
-            }).collect();
+            }).collect()
+    }
 
-        println!("Searching tracks");
-        let mut search_results: Vec<(String, String, Result<SearchResult, _>)> = vec![];
-
-        for (artist, query) in queries {
-            let query = sanitize_query(query);
-            let query_cloned = query.clone();
-            let future = spotify.search(
-                query_cloned.as_str(),
-                SearchType::Track,
-                50,
-                0,
-                None,
-                None,
-            );
-            search_results.push((artist, query, future.await));
-        }
-
-        let mut track_uris = vec![];
-        let mut failed_uris = vec![];
-
-        //TODO maybe use par it
-        search_results.iter()
-            .for_each(|(artist, query, find)| {
-                if let Ok(SearchResult::Tracks(tracks)) = find {
-                    let tracks = tracks.items
-                        .iter()
-                        .filter(|track| {
-                            let artists = build_track_artists(track);
-                            artists.contains(&artist)
-                        }).collect::<Vec<&FullTrack>>();
-                    match tracks.first() {
-                        None => {
-                            let message = format!("Could not find {} {}", artist, query);
-                            failed_uris.push(message);
-                        }
-                        Some(value) => {
-                            let uri = value.uri.clone();
-                            log::debug!("Found {} {:?}", query, uri);
-                            track_uris.push(uri);
-                        }
-                    }
-                }
-            });
-
-        failed_uris.iter().for_each(|message| log::debug!("{}", message));
-
-
-        let mut results = vec![];
-        //TODO at this point we should probably retry
-        let mut futures = track_uris.chunks(80);
-        while let Some(track_ids) = futures.next() {
-            results.push(spotify.user_playlist_add_tracks(
-                user.id.as_str(),
-                self.playlist.as_str(),
-                &track_ids,
-                None,
-            ).await);
-        }
-
-        results.iter().for_each(|res| {
-            match res {
-                Ok(result) => println!("Added {:?}", result),
-                Err(err) => println!("Failed to add because {}", err),
-            }
-        });
-
-        //TODO dont do this
-        Ok(())
+    async fn build_queries(&self) -> Result<Vec<(String, String)>, Error> {
+        let tidal = self.gather_data().await?;
+        let queries = self.convert_to_query(tidal);
+        Ok(queries)
     }
 }
 
@@ -213,15 +156,4 @@ pub async fn get_tidal_from_file(path: &PathBuf) -> Result<Tidal, Error> {
         Ok(val) => Ok(val),
         Err(err) => Err(anyhow::anyhow!(format!("Some issue {}", err)))
     }
-}
-
-fn sanitize_query(query: String) -> String {
-    let query = query.replace("(feat. ", "");
-    let query = query.replace(")", "");
-    query
-}
-
-
-fn build_track_artists(track: &FullTrack) -> Vec<String> {
-    track.artists.iter().map(|artist| artist.name.to_lowercase()).collect::<Vec<String>>()
 }
