@@ -12,7 +12,7 @@ mod tidal;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let test_import_playlist = "0T0Rdfh8bepjWcLAURRQ0U";
+    let test_import_playlist = "66cX8bDIrHpiXY5J07Orzs";
 
     // You can use any logger for debugging.
     pretty_env_logger::init();
@@ -41,6 +41,7 @@ async fn main() -> Result<(), Error> {
             let user = spotify.current_user().await.expect("Failed to get user");
 
 
+            println!("Collecting tracks");
             let queries: Vec<(String, String)> = tidal.items.iter()
                 .map(|track| {
                     let artist: String = track.item.artists.iter().map(|artist| artist.name.to_lowercase()).collect::<Vec<String>>().join(" ");
@@ -48,6 +49,7 @@ async fn main() -> Result<(), Error> {
                     (track.item.artist.name.to_lowercase(), query)
                 }).collect();
 
+            println!("Searching tracks");
             let mut search_results: Vec<(String, String, Result<SearchResult, _>)> = vec![];
 
             for (artist, query) in queries {
@@ -91,11 +93,11 @@ async fn main() -> Result<(), Error> {
                     }
                 });
 
-            let futures = track_uris.chunks(50).map(|track_ids| {
+            let futures = track_uris.chunks(99).map(|track_ids| {
                 spotify.user_playlist_add_tracks(
                     user.id.as_str(),
                     test_import_playlist,
-                    &track_uris,
+                    &track_ids,
                     None,
                 )
             });
