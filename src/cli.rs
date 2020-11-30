@@ -23,7 +23,7 @@ pub struct Opts {
 
     /// The location of the file to import
     #[structopt(long = "file", short = "f", parse(from_os_str))]
-    pub task_definition_file: PathBuf,
+    pub file: PathBuf,
 }
 
 pub fn get_opts_args() -> Opts {

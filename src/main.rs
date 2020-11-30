@@ -27,8 +27,7 @@ async fn main() -> Result<(), Error> {
 
     match get_token(&mut oauth).await {
         Some(token_info) => {
-            //TODO add structopt for file path
-            let tidal = tidal::get_tidal_from_file(String::from("./tidal-tracks-deathcore.json")).await?; //TODO add buffered reading
+            let tidal = tidal::get_tidal_from_file(opt.file).await?; //TODO add buffered reading
             println!("Importing {} tracks", tidal.items.len());
 
             println!("Getting spotify credentials");

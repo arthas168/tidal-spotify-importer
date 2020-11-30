@@ -3,6 +3,7 @@ use serde_json::Value;
 use anyhow::Error;
 use std::fs::File;
 use std::io::BufReader;
+use std::path::PathBuf;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -92,7 +93,7 @@ pub struct Mixes {
     pub master_track_mix: Option<String>,
 }
 
-pub async fn get_tidal_from_file(path: String) -> Result<Tidal, Error> {
+pub async fn get_tidal_from_file(path: PathBuf) -> Result<Tidal, Error> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let result: Result<Tidal, _> = serde_json::from_reader(reader);
