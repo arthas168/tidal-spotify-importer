@@ -7,15 +7,18 @@ use rspotify::model::track::FullTrack;
 use rspotify::oauth2::{SpotifyClientCredentials, SpotifyOAuth};
 use rspotify::senum::{Country, IncludeExternal, SearchType};
 use rspotify::util::get_token;
+use cli::Opts;
+use crate::cli::get_opts_args;
 
 mod tidal;
+mod cli;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let test_import_playlist = "0jWumFdwRDYSiT2ROnZ5RW";
-
     // You can use any logger for debugging.
     pretty_env_logger::init();
+
+    let opt = get_opts_args();
 
     // The default credentials from the `.env` file will be used by default.
     let mut oauth = SpotifyOAuth::default()
@@ -25,7 +28,7 @@ async fn main() -> Result<(), Error> {
     match get_token(&mut oauth).await {
         Some(token_info) => {
             //TODO add structopt for file path
-            let tidal = tidal::get_tidal_from_file(String::from("./tidal-tracks-mixed.json")).await?; //TODO add buffered reading
+            let tidal = tidal::get_tidal_from_file(String::from("./tidal-tracks-deathcore.json")).await?; //TODO add buffered reading
             println!("Importing {} tracks", tidal.items.len());
 
             println!("Getting spotify credentials");
@@ -96,17 +99,18 @@ async fn main() -> Result<(), Error> {
             failed_uris.iter().for_each(|message| log::debug!("{}", message));
 
 
+            let mut results = vec![];
             //TODO at this point we should probably retry
-            let futures = track_uris.chunks(80).map(|track_ids| {
-                spotify.user_playlist_add_tracks(
-                    user.id.as_str(),
-                    test_import_playlist,
-                    &track_ids,
-                    None,
-                )
-            });
+            let mut futures = track_uris.chunks(80);
+            while let Some(track_ids) = futures.next() {
+                    results.push(spotify.user_playlist_add_tracks(
+                        user.id.as_str(),
+                        opt.playlist.as_str(),
+                        &track_ids,
+                        None,
+                    ).await);
+            }
 
-            let results = futures::future::join_all(futures).await;
             results.iter().for_each(|res| {
                 match res {
                     Ok(result) => println!("Added {:?}", result),
