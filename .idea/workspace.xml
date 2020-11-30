@@ -32,6 +32,8 @@
   <component name="ChangeListManager">
     <list default="true" id="bb27fc3c-bcbb-4ee6-b960-17193771c396" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,26 +109,30 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1365" y="479" width="700" height="388" key="#com.intellij.fileTypes.FileTypeChooser/0.0.3440.1440@0.0.3440.1440" timestamp="1605715564608" />
+    <state x="1382" y="41" width="1135" height="1319" key="DiffContextDialog" timestamp="1606739159693">
+      <screen x="0" y="0" width="3440" height="1440" />
+    </state>
+    <state x="1382" y="41" width="1135" height="1319" key="DiffContextDialog/0.0.3440.1440@0.0.3440.1440" timestamp="1606739159693" />
     <state x="1137" y="406" key="FileChooserDialogImpl" timestamp="1605716030264">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1137" y="406" key="FileChooserDialogImpl/0.0.3440.1440@0.0.3440.1440" timestamp="1605716030264" />
-    <state width="1996" height="367" key="GridCell.Tab.0.bottom" timestamp="1606735763195">
+    <state width="1308" height="367" key="GridCell.Tab.0.bottom" timestamp="1606739304952">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1996" height="367" key="GridCell.Tab.0.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1606735763195" />
-    <state width="1996" height="367" key="GridCell.Tab.0.center" timestamp="1606735763193">
+    <state width="1308" height="367" key="GridCell.Tab.0.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1606739304952" />
+    <state width="1308" height="367" key="GridCell.Tab.0.center" timestamp="1606739304951">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1996" height="367" key="GridCell.Tab.0.center/0.0.3440.1440@0.0.3440.1440" timestamp="1606735763193" />
-    <state width="1996" height="367" key="GridCell.Tab.0.left" timestamp="1606735763192">
+    <state width="1308" height="367" key="GridCell.Tab.0.center/0.0.3440.1440@0.0.3440.1440" timestamp="1606739304951" />
+    <state width="1308" height="367" key="GridCell.Tab.0.left" timestamp="1606739304950">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1996" height="367" key="GridCell.Tab.0.left/0.0.3440.1440@0.0.3440.1440" timestamp="1606735763192" />
-    <state width="1996" height="367" key="GridCell.Tab.0.right" timestamp="1606735763194">
+    <state width="1308" height="367" key="GridCell.Tab.0.left/0.0.3440.1440@0.0.3440.1440" timestamp="1606739304950" />
+    <state width="1308" height="367" key="GridCell.Tab.0.right" timestamp="1606739304951">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1996" height="367" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1606735763194" />
+    <state width="1308" height="367" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1606739304951" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1606732544028">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
@@ -153,7 +159,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/main.rs</url>
-          <line>61</line>
+          <line>131</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

@@ -1,17 +1,18 @@
 use anyhow::Error;
+use futures::{StreamExt, SinkExt};
 use rspotify::client::Spotify;
+use rspotify::model::cud_result::CUDResult;
 use rspotify::model::search::SearchResult;
 use rspotify::model::track::FullTrack;
 use rspotify::oauth2::{SpotifyClientCredentials, SpotifyOAuth};
 use rspotify::senum::{Country, IncludeExternal, SearchType};
 use rspotify::util::get_token;
-use rspotify::model::cud_result::CUDResult;
 
 mod tidal;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let test_import_playlist = "0nAA9SMaBFq9HuthWj1E6D";
+    let test_import_playlist = "1MnoSgQYkCliMM7NxQ0kcj";
 
     // You can use any logger for debugging.
     pretty_env_logger::init();
@@ -36,6 +37,7 @@ async fn main() -> Result<(), Error> {
                 .client_credentials_manager(client_credential)
                 .build();
 
+            println!("Getting user");
             let user = spotify.current_user().await.expect("Failed to get user");
 
 
@@ -46,59 +48,130 @@ async fn main() -> Result<(), Error> {
                     (track.item.artist.name.to_lowercase(), query)
                 }).collect();
 
+            let mut search_results: Vec<(String, String, Result<SearchResult, _>)> = vec![];
+
             for (artist, query) in queries {
-                let query = query.replace("(feat. ", "");
-                let query = query.replace(")", "");
-                if let Ok(find) = spotify.search(
-                    query.as_str(),
+                let query = sanitize_query(query);
+                let query_cloned = query.clone();
+                let future = spotify.search(
+                    query_cloned.as_str(),
                     SearchType::Track,
                     50,
                     0,
                     None,
                     None,
-                ).await {
-                    match find {
-                        SearchResult::Tracks(tracks) => {
-                            let tracks = tracks.items
-                                .iter()
-                                .filter(|track| {
-                                    let artists = build_track_artists(track);
-                                    artists.contains(&artist)
-                                }).collect::<Vec<&FullTrack>>();
-                            match tracks.first() {
-                                None => println!("Could not find {} {}", artist, query),
-                                Some(value) => {
-                                    let uri = value.uri.clone();
-                                    log::debug!("Found {} {:?}", query, uri);
-
-                                    let playlists = spotify.current_user_playlists(10, 0).await;
-                                    log::trace!("{:?}", playlists);
-
-                                    let added = spotify.user_playlist_add_tracks(
-                                        user.id.as_str(),
-                                        test_import_playlist,
-                                        &[uri],
-                                        None
-                                    ).await;
-
-                                    match added {
-                                        Ok(result) => println!("Added {:?}", result),
-                                        Err(err) => println!("Failed to add because {}", err),
-                                    }
-
-
-                                }
-                            }
-
-                        }
-                        _ => {}
-                    }
-                };
+                );
+                search_results.push((artist, query, future.await));
             }
+
+            let mut track_uris = vec![];
+            let mut failed = vec![];
+
+            //TODO maybe use par it
+            search_results.iter()
+                .for_each(|(artist, query, find)| {
+                    if let Ok(SearchResult::Tracks(tracks)) = find {
+                        let tracks = tracks.items
+                            .iter()
+                            .filter(|track| {
+                                let artists = build_track_artists(track);
+                                artists.contains(&artist)
+                            }).collect::<Vec<&FullTrack>>();
+                        match tracks.first() {
+                            None => {
+                                println!("Could not find {} {}", artist, query); //TODO move me
+                                failed.push(format!("{}", query));
+                            }
+                            Some(value) => {
+                                let uri = value.uri.clone();
+                                log::debug!("Found {} {:?}", query, uri); //TODO iterate elsewhere
+                                track_uris.push(uri);
+                            }
+                        }
+                    }
+                });
+
+            let futures = track_uris.chunks(50).map(|track_ids| {
+                spotify.user_playlist_add_tracks(
+                    user.id.as_str(),
+                    test_import_playlist,
+                    &track_uris,
+                    None,
+                )
+            });
+
+            let results = futures::future::join_all(futures).await;
+            results.iter().for_each(|res| {
+                match res {
+                    Ok(result) => println!("Added {:?}", result),
+                    Err(err) => println!("Failed to add because {}", err),
+                }
+            })
+            // let added = spotify.user_playlist_add_tracks(
+            //     user.id.as_str(),
+            //     test_import_playlist,
+            //     &track_uris,
+            //     None,
+            // ).await;
+
+
+
+            // for (artist, query) in queries {
+            //     let query = query.replace("(feat. ", "");
+            //     let query = query.replace(")", "");
+            //     if let Ok(find) = spotify.search(
+            //         query.as_str(),
+            //         SearchType::Track,
+            //         50,
+            //         0,
+            //         None,
+            //         None,
+            //     ).await {
+            //         match find {
+            //             SearchResult::Tracks(tracks) => {
+            //                 let tracks = tracks.items
+            //                     .iter()
+            //                     .filter(|track| {
+            //                         let artists = build_track_artists(track);
+            //                         artists.contains(&artist)
+            //                     }).collect::<Vec<&FullTrack>>();
+            //                 match tracks.first() {
+            //                     None => println!("Could not find {} {}", artist, query),
+            //                     Some(value) => {
+            //                         let uri = value.uri.clone();
+            //                         log::debug!("Found {} {:?}", query, uri);
+            //
+            //                         let playlists = spotify.current_user_playlists(10, 0).await;
+            //                         log::trace!("{:?}", playlists);
+            //
+            //                         let added = spotify.user_playlist_add_tracks(
+            //                             user.id.as_str(),
+            //                             test_import_playlist,
+            //                             &[uri],
+            //                             None,
+            //                         ).await;
+            //
+            //                         match added {
+            //                             Ok(result) => println!("Added {:?}", result),
+            //                             Err(err) => println!("Failed to add because {}", err),
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //             _ => {}
+            //         }
+            //     };
+            // }
         }
         None => log::error!("Authentication failed"),
     };
     Ok(())
+}
+
+fn sanitize_query(query: String) -> String {
+    let query = query.replace("(feat. ", "");
+    let query = query.replace(")", "");
+    query
 }
 
 fn build_track_artists(track: &FullTrack) -> Vec<String> {
