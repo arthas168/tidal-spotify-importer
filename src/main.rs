@@ -11,7 +11,7 @@ mod tidal;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let test_import_playlist = "0nAA9SMaBFq9HuthWj1E6D";
+    let test_import_playlist = "1MnoSgQYkCliMM7NxQ0kcj";
 
     // You can use any logger for debugging.
     pretty_env_logger::init();
@@ -83,7 +83,7 @@ async fn main() -> Result<(), Error> {
 
                                     match added {
                                         Ok(result) => println!("Added {:?}", result),
-                                        Err(err) => println!("Failed to add because {}", err),
+                                        Err(err) => println!("Failed to add to playlist because {}", err),
                                     }
 
 
